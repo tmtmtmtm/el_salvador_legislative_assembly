@@ -30,6 +30,7 @@ else
 end
 
 noko = noko_for(la_url)
+ids = ScraperWiki::select('id from data')
 
 noko.css('dl dt a').each do |a|
 	person_url = a.xpath('./@href').text
@@ -42,7 +43,7 @@ noko.css('dl dt a').each do |a|
 	id = person_url.sub(/.*\//, '')
 	puts "id: #{id}"
 
-	ids = ScraperWiki::select('id from data')
+	# The server keeps going down, so better to only scrape data we don't already have
 	if not ids.include?(id)
 		p = noko_for(person_url)
 		name = p.css('h1').text
