@@ -1,25 +1,50 @@
-# This is a template for a Ruby scraper on morph.io (https://morph.io)
-# including some code snippets below that you should find helpful
+#!/bin/env ruby
+# encoding: utf-8
 
-# require 'scraperwiki'
-# require 'mechanize'
-#
-# agent = Mechanize.new
-#
-# # Read in a page
-# page = agent.get("http://foo.com")
-#
-# # Find somehing on the page using css selectors
-# p page.at('div.content')
-#
-# # Write out to the sqlite database using scraperwiki library
-# ScraperWiki.save_sqlite(["name"], {"name" => "susan", "occupation" => "software developer"})
-#
-# # An arbitrary query against the database
-# ScraperWiki.select("* from data where 'name'='peter'")
+require 'scraperwiki'
+require 'nokogiri'
+# require 'open-uri/cached'
+# OpenURI::Cache.cache_path = '.cache'
+require 'open-uri'
 
-# You don't have to do things with the Mechanize or ScraperWiki libraries.
-# You can use whatever gems you want: https://morph.io/documentation/ruby
-# All that matters is that your final data is written to an SQLite database
-# called "data.sqlite" in the current working directory which has at least a table
-# called "data".
+class String
+  def tidy
+    self.gsub(/[[:space:]]+/, ' ').strip
+  end
+end
+
+def noko_for(url)
+  Nokogiri::HTML(open(url).read)
+end
+
+la_url = 'http://asamblea.gob.sv/pleno/pleno-legislativo'
+noko = noko_for(la_url)
+
+noko.css('dl dt a').each do |a|
+	person_url = a.xpath('./@href').text
+	person_url.sub!('asamblea.gob.sv/pleno', 'localhost')
+	puts person_url
+
+	id = person_url.sub(/.*\//, '')
+
+	p = noko_for(person_url)
+	name = p.css('h1').text
+
+	party_class = 'Grupo Parlamentario'
+	group = p.xpath("//span[@class='informacion-diputado'][contains(.,'#{party_class}')]")
+		.first.text.sub(/.*#{party_class}/, '')
+
+	email = p.xpath("//span[.//img[contains(@src,'/emailicon.png')]]/a/@href").text.sub('mailto:', '')
+
+	personal_email = p.xpath("//a[.//img[contains(@src,'personal-emailicon.png')]]/span").text
+	
+	data = {
+		id: id,
+		name: name,
+		group: group.tidy,
+		email: email,
+		email__personal: personal_email
+	}
+	ScraperWiki.save_sqlite([:id], data)
+end
+
