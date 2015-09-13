@@ -22,7 +22,7 @@ noko = noko_for(la_url)
 
 noko.css('dl dt a').each do |a|
 	person_url = a.xpath('./@href').text
-	person_url.sub!('asamblea.gob.sv/pleno', 'localhost')
+	# person_url.sub!('asamblea.gob.sv/pleno', 'localhost')
 	puts person_url
 
 	id = person_url.sub(/.*\//, '')
