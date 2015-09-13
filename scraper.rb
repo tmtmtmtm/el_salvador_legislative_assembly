@@ -30,7 +30,13 @@ else
 end
 
 noko = noko_for(la_url)
-ids = ScraperWiki::select('id from data')
+id_hashes = ScraperWiki::select('id from data')
+ids = []
+
+# ids get returned as an array of hashes
+id_hashes.each do |hash|
+	ids.push(hash["id"])
+end
 
 noko.css('dl dt a').each do |a|
 	person_url = a.xpath('./@href').text
