@@ -7,6 +7,7 @@ require 'nokogiri'
 # OpenURI::Cache.cache_path = '.cache'
 require 'open-uri'
 
+
 class String
   def tidy
     self.gsub(/[[:space:]]+/, ' ').strip
@@ -17,11 +18,14 @@ def noko_for(url)
   Nokogiri::HTML(open(url).read)
 end
 
-local = true
+local = false
+# local = true
+sleep_between_requests = 60 # (seconds) be kind to El Salvador's server!
 
-la_url = 'http://asamblea.gob.sv/pleno/pleno-legislativo'
+la_url = open('http://asamblea.gob.sv/pleno/pleno-legislativo', read_timeout: 60)
 
-if local do
+if local
+	require 'pry'
 	la_url = 'http://localhost:8000/pleno_legislativo.html'
 end
 
@@ -30,7 +34,7 @@ noko = noko_for(la_url)
 noko.css('dl dt a').each do |a|
 	person_url = a.xpath('./@href').text
 
-	if local do
+	if local
 		person_url.sub!('asamblea.gob.sv/pleno', 'localhost')
 	end
 	puts person_url
@@ -52,19 +56,22 @@ noko.css('dl dt a').each do |a|
 
 	personal_email = p.xpath("//a[.//img[contains(@src,'personal-emailicon.png')]]/span").text
 	puts personal_email
+
+	image = p.xpath("//h1/following-sibling::img[1]/@src").text.sub(/.*\//, "#{person_url}/")
+	puts image
 	
 	data = {
 		id: id,
 		name: name,
-		group: group.tidy,
+		faction: group.tidy,
 		email: email,
-		email__personal: personal_email
+		email__personal: personal_email,
+		image: image,
 	}
-	if local do
+	ScraperWiki.save_sqlite([:id], data)
+	if local
 		puts data
 		break
-	else
-		ScraperWiki.save_sqlite([:id], data)
 	end
+	sleep(sleep_between_requests)
 end
-
