@@ -78,9 +78,9 @@ noko.css('dl dt a').each do |a|
 			image: image,
 		}
 		ScraperWiki.save_sqlite([:id], data)
+		sleep(sleep_between_requests)
 
 	else
 		puts "already in database"
 	end
-	sleep(sleep_between_requests)
 end
