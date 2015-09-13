@@ -26,17 +26,22 @@ noko.css('dl dt a').each do |a|
 	puts person_url
 
 	id = person_url.sub(/.*\//, '')
+	puts id
 
 	p = noko_for(person_url)
 	name = p.css('h1').text
+	puts name
 
 	party_class = 'Grupo Parlamentario'
 	group = p.xpath("//span[@class='informacion-diputado'][contains(.,'#{party_class}')]")
 		.first.text.sub(/.*#{party_class}/, '')
+	puts group
 
 	email = p.xpath("//span[.//img[contains(@src,'/emailicon.png')]]/a/@href").text.sub('mailto:', '')
+	puts email
 
 	personal_email = p.xpath("//a[.//img[contains(@src,'personal-emailicon.png')]]/span").text
+	puts personal_email
 	
 	data = {
 		id: id,
