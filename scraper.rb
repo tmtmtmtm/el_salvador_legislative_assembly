@@ -18,8 +18,8 @@ def noko_for(url)
   Nokogiri::HTML(open(url).read)
 end
 
-# local = false
-local = true
+local = false
+# local = true
 sleep_between_requests = 60 # (seconds) be kind to El Salvador's server!
 
 if local
