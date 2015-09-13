@@ -17,12 +17,22 @@ def noko_for(url)
   Nokogiri::HTML(open(url).read)
 end
 
+local = true
+
 la_url = 'http://asamblea.gob.sv/pleno/pleno-legislativo'
+
+if local do
+	la_url = 'http://localhost:8000/pleno_legislativo.html'
+end
+
 noko = noko_for(la_url)
 
 noko.css('dl dt a').each do |a|
 	person_url = a.xpath('./@href').text
-	# person_url.sub!('asamblea.gob.sv/pleno', 'localhost')
+
+	if local do
+		person_url.sub!('asamblea.gob.sv/pleno', 'localhost')
+	end
 	puts person_url
 
 	id = person_url.sub(/.*\//, '')
@@ -50,6 +60,11 @@ noko.css('dl dt a').each do |a|
 		email: email,
 		email__personal: personal_email
 	}
-	ScraperWiki.save_sqlite([:id], data)
+	if local do
+		puts data
+		break
+	else
+		ScraperWiki.save_sqlite([:id], data)
+	end
 end
 
