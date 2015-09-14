@@ -26,7 +26,7 @@ if local
 	require 'pry'
 	la_url = 'http://localhost:8000/pleno_legislativo.html'
 else
-	la_url = open('http://asamblea.gob.sv/pleno/pleno-legislativo', read_timeout: 60)
+	la_url = open('http://asamblea.gob.sv/pleno/pleno-legislativo', read_timeout: 500)
 end
 
 noko = noko_for(la_url)
