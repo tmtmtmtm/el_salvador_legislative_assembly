@@ -23,7 +23,7 @@ get_all = ENV['MORPH_GET_ALL']
 
 sleep_between_requests = 60 # (seconds) be kind to El Salvador's server!
 
-if local
+if local == 'true'
     require 'pry'
     la_url = 'http://localhost:8000/pleno_legislativo.html'
 else
@@ -42,7 +42,7 @@ end
 noko.css('dl dt a').each do |a|
     person_url = a.xpath('./@href').text
 
-    if local
+    if local == 'true'
         person_url.sub!('asamblea.gob.sv/pleno', 'localhost')
     end
     puts "source: #{person_url}"
@@ -51,7 +51,7 @@ noko.css('dl dt a').each do |a|
     puts "id: #{id}"
 
     # The server keeps going down, so better to only scrape data we don't already have
-    if not ids.include?(id) or get_all
+    if not ids.include?(id) or get_all == 'true'
         p = noko_for(person_url)
         name = p.css('h1').text
         puts "name: #{name}"
