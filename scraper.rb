@@ -18,8 +18,9 @@ def noko_for(url)
   Nokogiri::HTML(open(url).read)
 end
 
-local = false
-# local = true
+local = ENV['MORPH_LOCAL']
+get_all = ENV['MORPH_GET_ALL']
+
 sleep_between_requests = 60 # (seconds) be kind to El Salvador's server!
 
 if local
@@ -50,7 +51,7 @@ noko.css('dl dt a').each do |a|
     puts "id: #{id}"
 
     # The server keeps going down, so better to only scrape data we don't already have
-    if not ids.include?(id)
+    if not ids.include?(id) or get_all
         p = noko_for(person_url)
         name = p.css('h1').text
         puts "name: #{name}"
