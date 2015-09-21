@@ -31,7 +31,6 @@ else
     la_url = open('http://asamblea.gob.sv/pleno/pleno-legislativo', read_timeout: 500)
 end
 
-noko = noko_for(la_url)
 id_hashes = ScraperWiki::select('id from data')
 ids = []
 
@@ -131,6 +130,7 @@ if local == 'true' and scrape_urls_from_homepage == 'false'
                    "localhost:8000/alma_cruz.html",
                    ]
 elsif scrape_urls_from_homepage == 'true'
+    noko = noko_for(la_url)
     person_urls = noko.css('dl dt a')
 end
 
