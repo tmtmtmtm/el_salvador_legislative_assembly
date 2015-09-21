@@ -32,7 +32,7 @@ if local == 'true'
     require 'pry'
     la_url = 'http://localhost:8000/pleno_legislativo.html'
 else
-    la_url = open('http://asamblea.gob.sv/pleno/pleno-legislativo', read_timeout: 500)
+    la_url = 'http://asamblea.gob.sv/pleno/pleno-legislativo'
 end
 
 puts "getting ids from database"
@@ -136,6 +136,7 @@ if local == 'true' and scrape_urls_from_homepage == 'false'
                    "localhost:8000/alma_cruz.html",
                    ]
 elsif scrape_urls_from_homepage == 'true'
+    la_url = open(la_url, read_timeout: 500)
     noko = noko_for(la_url)
     person_urls = noko.css('dl dt a')
 end
