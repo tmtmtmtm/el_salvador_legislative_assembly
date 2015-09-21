@@ -130,12 +130,13 @@ if local == 'true' and scrape_urls_from_homepage == 'false'
     person_urls = ["localhost:8000/ana_vilma.html",
                    "localhost:8000/alma_cruz.html",
                    ]
-elsif scrape_urls_from_homepage == 'true'   
+elsif scrape_urls_from_homepage == 'true'
     person_urls = noko.css('dl dt a')
 end
 
-person_urls.each do |a| 
+person_urls.each do |a|
     person_url = a
+    puts person_url
     if scrape_urls_from_homepage == 'true'
         person_url = a.xpath('./@href').text
     end
