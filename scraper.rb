@@ -20,6 +20,7 @@ end
 
 local = ENV['MORPH_LOCAL']
 get_all = ENV['MORPH_GET_ALL']
+scrape_urls_from_homepage = ENV['MORPH_SCRAPE_URLS_FROM_HOMEPAGE']
 
 sleep_between_requests = 60 # (seconds) be kind to El Salvador's server!
 
@@ -39,8 +40,105 @@ id_hashes.each do |hash|
     ids.push(hash["id"])
 end
 
-noko.css('dl dt a').each do |a|
-    person_url = a.xpath('./@href').text
+# There are often 'bad gateway' errors on the homepage, maybe bypassing the homepage altogether
+# will work?
+person_urls = ["http://asamblea.gob.sv/pleno/pleno-legislativo/jose-antonio-almendariz-rivas",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/ana-marina-alvarenga-barahona",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/rodrigo-avila-aviles",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/lucia-del-carmen-ayala-de-leon",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/ana-lucia-baires-de-martinez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/marta-evelyn-batres-araujo",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/roger-alberto-blandino-nerio-jeremias-nerio",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/manuel-orlando-cabrera-candray",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/yohalmo-edmundo-cabrera-chacon",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/carmen-elena-calderon-sol-de-escalon",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/silvia-alejandrina-castro-figueroa",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/norma-cristina-cornejo-amaya",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/valentin-aristides-corpeno",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/raul-omar-cuellar",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/rene-gustavo-escalante-zelaya",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/margarita-escobar",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jorge-alberto-escobar-bernal",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jose-edgar-escolan-batarse",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/julio-cesar-fabian-perez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/santiago-flores-alfaro",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/juan-manuel-de-jesus-flores-cornejo",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/guillermo-antonio-gallegos-navarrete",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/carlos-alberto-garcia",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/ricardo-ernesto-godoy-penate",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/maria-elizabeth-perla-gomez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/medardo-gonzalez-trejo",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/norma-fidelia-guevara-de-ramirios",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/vicente-hernandez-gomez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/karla-elena-hernandez-molina",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/estela-yanet-hernandez-rodriguez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/juan-pablo-herrera-rivas",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/maytee-gabriela-iraheta-escalante",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/bonner-francisco-jimenez-belloso",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/mauricio-roberto-linares-ramirez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/audelia-guadalupe-lopez-de-kleutgens",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/cristina-esmeralda-lopez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/reynaldo-antonio-lopez-cardoza",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/hortensia-margarita-lopez-quintana",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/mario-marroquin-mejia",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/rodolfo-antonio-martinez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/guillermo-francisco-mata-bennett",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/rolando-mata-fuentes",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/calixto-mejia-hernandez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/misael-mejia-mejia",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jose-santos-melara-yanes",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/juan-carlos-mendoza-portillo",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jose-francisco-merino-lopez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/ernesto-luis-muyshondt-garcia-prieto",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jose-serafin-orantes-rodriguez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/silvia-estela-ostorga-de-escobar",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jose-javier-palomo-nieto",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/rodolfo-antonio-parker-soto",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/lorena-guadalupe-pena-mendoza",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/mario-antonio-ponce-lopez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/rene-alfredo-portillo-cuadra",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/zoila-beatriz-quijada-solis-1",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/norman-noel-quijano-gonzalez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/nelson-de-jesus-quintanilla-gomez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/david-ernesto-reyes-molina",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/carlos-armando-reyes-ramos",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/lorenzo-rivas-echeverria",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/santos-adelmo-rivas-rivas",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jackeline-noemi-rivera-avalos",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/vilma-carolina-rodriguez-davila",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/abilio-orestes-rodriguez-menjivar",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/sonia-margarita-rodriguez-siguenza",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/alberto-armando-romero-rodriguez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/numan-pompilio-salgado-garcia",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jaime-orlando-sandoval",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/karina-ivette-sosa-de-lara",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/manuel-rigoberto-soto-lazo",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/mario-alberto-tenorio-guerrero",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jaime-gilberto-valdez-hernandez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/patricia-elena-valdivieso-de-gallardo",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/juan-alberto-valiente-alvarez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/maria-marta-concepcion-valladares-mendoza-nidia-diaz",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/donato-eugenio-vaquerano-rivas",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/mauricio-ernesto-vargas-valdez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/guadalupe-antonio-vasquez-martinez",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/ricardo-andres-velasquez-parker",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/john-tennant-wright-sol",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/francisco-jose-zablah-safie",
+               ]
+
+if local == 'true' and scrape_urls_from_homepage == 'false'
+    person_urls = ["localhost:8000/ana_vilma.html",
+                   "localhost:8000/alma_cruz.html",
+                   ]
+elsif scrape_urls_from_homepage == 'true'   
+    person_urls = noko.css('dl dt a')
+end
+
+person_urls.each do |a| 
+    person_url = a
+    if scrape_urls_from_homepage == 'true'
+        person_url = a.xpath('./@href').text
+    end
 
     if local == 'true'
         person_url.sub!('asamblea.gob.sv/pleno', 'localhost')
