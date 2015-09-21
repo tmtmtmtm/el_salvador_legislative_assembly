@@ -22,6 +22,10 @@ local = ENV['MORPH_LOCAL']
 get_all = ENV['MORPH_GET_ALL']
 scrape_urls_from_homepage = ENV['MORPH_SCRAPE_URLS_FROM_HOMEPAGE']
 
+puts "local #{local}"
+puts "get_all #{get_all}"
+puts "scrape_urls_from_homepage #{scrape_urls_from_homepage}"
+
 sleep_between_requests = 60 # (seconds) be kind to El Salvador's server!
 
 if local == 'true'
@@ -31,7 +35,9 @@ else
     la_url = open('http://asamblea.gob.sv/pleno/pleno-legislativo', read_timeout: 500)
 end
 
+puts "getting ids from database"
 id_hashes = ScraperWiki::select('id from data')
+puts "done"
 ids = []
 
 # ids get returned as an array of hashes
@@ -136,7 +142,7 @@ end
 
 person_urls.each do |a|
     person_url = a
-    puts person_url
+
     if scrape_urls_from_homepage == 'true'
         person_url = a.xpath('./@href').text
     end
