@@ -26,7 +26,7 @@ puts "local #{local}"
 puts "get_all #{get_all}"
 puts "scrape_urls_from_homepage #{scrape_urls_from_homepage}"
 
-sleep_between_requests = 60 # (seconds) be kind to El Salvador's server!
+sleep_between_requests = 20 # (seconds) be kind to El Salvador's server!
 
 # Not scraping this because there seem to be mistakes on the page,
 term = "2015-2018"
@@ -50,7 +50,8 @@ end
 
 # There are often 'bad gateway' errors on the homepage, maybe bypassing the homepage altogether
 # will work?
-person_urls = ["http://asamblea.gob.sv/pleno/pleno-legislativo/jose-antonio-almendariz-rivas",
+person_urls = ["http://asamblea.gob.sv/pleno/pleno-legislativo/ana-vilma-albanez-de-escobar",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/jose-antonio-almendariz-rivas",
                "http://asamblea.gob.sv/pleno/pleno-legislativo/ana-marina-alvarenga-barahona",
                "http://asamblea.gob.sv/pleno/pleno-legislativo/rodrigo-avila-aviles",
                "http://asamblea.gob.sv/pleno/pleno-legislativo/lucia-del-carmen-ayala-de-leon",
@@ -180,6 +181,9 @@ person_urls.each do |a|
         puts "image: #{image}\n"
 
         puts "term: #{term}\n"
+
+        district = p.css('img#imagen_departamento_diputado')[0]['title']
+        puts district
         
         data = {
             id: id,
@@ -191,7 +195,7 @@ person_urls.each do |a|
             source: person_url,
             term: term,
         }
-        
+
         ScraperWiki.save_sqlite([:id], data)
         sleep(sleep_between_requests)
 
