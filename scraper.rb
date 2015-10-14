@@ -184,7 +184,7 @@ person_urls.each do |a|
         puts "term: #{term}\n"
 
         district = p.css('img#imagen_departamento_diputado')[0]['title']
-        puts district
+        puts "district: #{district}\n\n"
         
         data = {
             id: id,
