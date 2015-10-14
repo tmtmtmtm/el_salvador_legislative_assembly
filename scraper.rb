@@ -64,6 +64,7 @@ person_urls = ["http://asamblea.gob.sv/pleno/pleno-legislativo/ana-vilma-albanez
                "http://asamblea.gob.sv/pleno/pleno-legislativo/silvia-alejandrina-castro-figueroa",
                "http://asamblea.gob.sv/pleno/pleno-legislativo/norma-cristina-cornejo-amaya",
                "http://asamblea.gob.sv/pleno/pleno-legislativo/valentin-aristides-corpeno",
+               "http://asamblea.gob.sv/pleno/pleno-legislativo/rosa-alma-cruz-marinero",
                "http://asamblea.gob.sv/pleno/pleno-legislativo/raul-omar-cuellar",
                "http://asamblea.gob.sv/pleno/pleno-legislativo/rene-gustavo-escalante-zelaya",
                "http://asamblea.gob.sv/pleno/pleno-legislativo/margarita-escobar",
