@@ -28,9 +28,12 @@ puts "scrape_urls_from_homepage #{scrape_urls_from_homepage}"
 
 sleep_between_requests = 60 # (seconds) be kind to El Salvador's server!
 
+# Not scraping this because there seem to be mistakes on the page,
+term = "2015-2018"
+
 if local == 'true'
     require 'pry'
-    la_url = 'http://localhost:8000/pleno_legislativo.html'
+    la_url = 'http://localhost:4000/pleno_legislativo.html'
 else
     la_url = 'http://asamblea.gob.sv/pleno/pleno-legislativo'
 end
@@ -175,6 +178,8 @@ person_urls.each do |a|
 
         image = p.xpath("//h1/following-sibling::img[1]/@src").text.sub(/.*\//, "#{person_url}/")
         puts "image: #{image}\n"
+
+        puts "term: #{term}\n"
         
         data = {
             id: id,
@@ -184,7 +189,9 @@ person_urls.each do |a|
             email__personal: personal_email,
             image: image,
             source: person_url,
+            term: term,
         }
+        
         ScraperWiki.save_sqlite([:id], data)
         sleep(sleep_between_requests)
 
