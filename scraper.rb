@@ -3,6 +3,7 @@
 
 require 'scraperwiki'
 require 'nokogiri'
+require 'pry'
 # require 'open-uri/cached'
 # OpenURI::Cache.cache_path = '.cache'
 require 'open-uri'
@@ -32,7 +33,6 @@ sleep_between_requests = 20 # (seconds) be kind to El Salvador's server!
 term = "2015-2018"
 
 if local == 'true'
-    require 'pry'
     la_url = 'http://localhost:4000/pleno_legislativo.html'
 else
     la_url = 'http://asamblea.gob.sv/pleno/pleno-legislativo'
