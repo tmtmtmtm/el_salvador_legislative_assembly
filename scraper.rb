@@ -49,37 +49,26 @@ term = "2015-2018"
 to_scrape = people_to_scrape
 warn "#{to_scrape.count} people to scrape"
 to_scrape.each do |person_url|
-    puts "source: #{person_url}"
-
-    id = person_url.sub(/.*\//, '')
-    puts "id: #{id}"
+    puts "Fetching: #{person_url}"
 
     begin
         p = noko_for(person_url)
         name = p.css('h1').text
-        puts "name: #{name}"
 
         party_class = 'Grupo Parlamentario'
         group = p.xpath("//span[@class='informacion-diputado'][contains(.,'#{party_class}')]")
             .first.text.sub(/.*#{party_class}/, '').tidy
-        puts "faction: #{group}"
 
         email = p.xpath("//span[.//img[contains(@src,'/emailicon.png')]]/a/@href").text.sub('mailto:', '')
-        puts "email: #{email}"
 
         personal_email = p.xpath("//a[.//img[contains(@src,'personal-emailicon.png')]]/span").text
-        puts "personal email: #{personal_email}"
 
         image = p.xpath("//h1/following-sibling::img[1]/@src").text.sub(/.*\//, "#{person_url}/")
-        puts "image: #{image}\n"
-
-        puts "term: #{term}\n"
 
         district = p.css('img#imagen_departamento_diputado')[0]['title']
-        puts "district: #{district}\n\n"
         
         data = {
-            id: id,
+            id: File.basename(person_url),
             name: name,
             faction: group,
             email: email,
@@ -88,11 +77,11 @@ to_scrape.each do |person_url|
             source: person_url,
             term: term,
         }
-
+        puts data
         ScraperWiki.save_sqlite([:id], data)
 
-    rescue
-        warn "Couldn't scrape #{person_url}"
+    rescue Exception => e
+        warn "Couldn't scrape #{person_url}: #{e}"
         sleep(sleep_between_requests)
     end
 end
