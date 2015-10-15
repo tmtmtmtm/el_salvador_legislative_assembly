@@ -27,6 +27,7 @@ def rescrape_homepage
     data = { 
       id: File.basename(a.attr('href')),
       name: a.text.tidy,
+      term: nil,
       source: a.attr('href'),
     }
     existing = ScraperWiki.select('COUNT(*) AS count FROM data WHERE id = ?', [data[:id]]) rescue [{}]
@@ -73,6 +74,7 @@ to_scrape.each do |person_url|
             faction: group,
             email: email,
             email__personal: personal_email,
+            district: district,
             image: image,
             source: person_url,
             term: term,
