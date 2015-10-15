@@ -39,14 +39,7 @@ else
 end
 
 puts "getting ids from database"
-id_hashes = ScraperWiki::select('id from data')
-puts "done"
-ids = []
-
-# ids get returned as an array of hashes
-id_hashes.each do |hash|
-    ids.push(hash["id"])
-end
+ids = ScraperWiki::select('id from data').map { |h| h["id"] }
 
 # There are often 'bad gateway' errors on the homepage, maybe bypassing the homepage altogether
 # will work?
